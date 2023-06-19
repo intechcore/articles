@@ -1,0 +1,17 @@
+println "Hello, Jimple"
+<----->
+Hello, Jimple
+<----->
+println 12+45
+<----->
+57
+<----->
+fun sum(a, b) {return a + b}
+println sum(2, 5)
+<----->
+7
+<----->
+println sum(5, 95)
+fun sum(a, b) {return a + b}
+<----->
+100

@@ -1,0 +1,7 @@
+var result = "World"
+
+println "Hello, " + subject(result)
+
+fun subject(name) {
+    return name + "!"
+}

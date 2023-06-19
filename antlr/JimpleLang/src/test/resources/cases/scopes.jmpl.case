@@ -1,0 +1,32 @@
+var outer = 42
+
+{
+   var inner = 666
+   println "outer in scope: " + outer
+   println "inner in scope: " + inner
+   outer = outer + 1
+}
+
+println "outer after scope: " + outer
+<----->
+outer in scope: 42
+inner in scope: 666
+outer after scope: 43
+<----->
+{
+   fun power(a) {
+        return a * a
+   }
+}
+
+println "try to use function out of scope: " + power(2)
+<----->
+!ERROR: Function not found: power
+<----->
+{
+   var inner = 666
+}
+
+println "inner after scope: " + inner
+<----->
+!ERROR: Variable not found: inner

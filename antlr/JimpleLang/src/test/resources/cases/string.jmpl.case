@@ -1,0 +1,46 @@
+var result = 9 + 10
+
+println "Result is " + add(result, 21)
+
+fun add(a, b) {
+    return a + b
+}
+<----->
+Result is 40
+<----->
+println "12" > "145"
+<----->
+false
+<----->
+println "12" < "145"
+<----->
+true
+<----->
+println "125" > "124"
+<----->
+true
+<----->
+println "125" < "124"
+<----->
+false
+<----->
+println "125" <= "124"
+<----->
+false
+<----->
+println "5" <= "5"
+<----->
+true
+<----->
+println "foo" / "bar"
+<----->
+!ERROR: Expected number but found: String
+<----->
+println "foo" - 12
+<----->
+!ERROR: Operator '-' not supported for String
+<----->
+println 12 - ("foo")
+<----->
+!ERROR: Operator '-' not supported for String
+<----->
