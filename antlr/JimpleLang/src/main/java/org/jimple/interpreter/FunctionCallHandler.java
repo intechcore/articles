@@ -9,4 +9,9 @@ import org.jimple.lang.JimpleParser;
  */
 public interface FunctionCallHandler {
     Object handleFunc(FunctionSignature func, List<String> parameters, List<Object> arguments, JimpleParser.FunctionDefinitionContext ctx);
+
+    /**
+     * Noop implementation of {@link FunctionCallHandler}
+     */
+    FunctionCallHandler EMPTY = (func, parameters, arguments, ctx) -> JimpleInterpreter.VOID;
 }

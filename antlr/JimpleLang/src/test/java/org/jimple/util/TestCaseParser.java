@@ -17,7 +17,7 @@ public class TestCaseParser {
     public List<TestCase> parse(final URL resourceUrl) throws IOException {
         final String content = IOUtils.toString(resourceUrl, StandardCharsets.UTF_8);
         final String[] parts = BREAK_LINE_PAT.split(content);
-        final int caseCount = parts.length / 2;
+        final int caseCount = (parts.length + 1) / 2;
         final List<TestCase> result = new ArrayList<>(caseCount);
 
         for (int i = 0; i < caseCount; i++) {

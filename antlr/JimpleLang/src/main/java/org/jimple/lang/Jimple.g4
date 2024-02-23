@@ -1,7 +1,9 @@
 grammar Jimple;
 
+// корневое правило грамматики
 program: (statement)* EOF;
 
+// список возможных утверждений
 statement: variableDeclaration
          | assignment
          | functionDefinition
@@ -12,6 +14,7 @@ statement: variableDeclaration
          | blockStatement
          ;
 
+// список возможных выражений
 expression: '(' expression ')'                                      #parenthesisExpr
           | left=expression op=(ASTERISK | SLASH) right=expression  #mulDivExpr
           | left=expression op=(PLUS | MINUS) right=expression      #plusMinusExpr
@@ -23,6 +26,7 @@ expression: '(' expression ')'                                      #parenthesis
           | functionCall                                            #funcCallExpr
           ;
 
+// описания отдельных выражений и утверждений
 variableDeclaration: 'var' IDENTIFIER '=' expression ;
 
 assignment: IDENTIFIER '=' expression ;
@@ -43,6 +47,7 @@ ifStatement: 'if' '(' expression ')' statement  elseStatement? ;
 
 elseStatement: 'else' statement ;
 
+// список токенов
 IDENTIFIER          : [a-zA-Z_] [a-zA-Z_0-9]* ;
 NUMBER              : [0-9]+ ;
 DOUBLE_NUMBER       : NUMBER '.' NUMBER ;

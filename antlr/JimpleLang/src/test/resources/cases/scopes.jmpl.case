@@ -21,7 +21,12 @@ outer after scope: 43
 
 println "try to use function out of scope: " + power(2)
 <----->
-!ERROR: Function not found: power
+ERROR: Function with such signature not found: power
+println "try to use function out of scope: " + power(2)
+                                               ^
+WARNING: Function declared but not used: power
+   fun power(a) {
+       ^
 <----->
 {
    var inner = 666
@@ -29,4 +34,6 @@ println "try to use function out of scope: " + power(2)
 
 println "inner after scope: " + inner
 <----->
-!ERROR: Variable not found: inner
+ERROR: Identifier not found: inner
+println "inner after scope: " + inner
+                                ^

@@ -6,10 +6,15 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.io.IOUtils;
+import org.jimple.diagnotics.Issue;
+import org.jimple.diagnotics.JimpleDiagnosticTool;
+import org.jimple.error.CodeValidateException;
 import org.jimple.lang.JimpleLexer;
 import org.jimple.lang.JimpleParser;
 
@@ -35,19 +40,73 @@ public class JimpleInterpreter {
      *
      * @return last value of expression or return statement
      */
-    public Object eval(final String input) {
+    public Object eval(final String input) throws CodeValidateException {
+        return eval(input, null, new ArrayList<>(0));
+    }
+
+    /**
+     * Execute jimple source code
+     *
+     * @return last value of expression or return statement
+     */
+    public Object eval(final String input, final List<Issue> warnings) throws CodeValidateException {
+        return eval(input, null, warnings);
+    }
+
+    /**
+     * Execute jimple source code
+     *
+     * @return last value of expression or return statement
+     */
+    public Object eval(final String input, final Path path, final List<Issue> warnings) throws CodeValidateException {
         final JimpleLexer lexer = new JimpleLexer(CharStreams.fromString(input));
         final JimpleParser parser = new JimpleParser(new CommonTokenStream(lexer));
+
+        final List<Issue> issues = validate(input, path);
+
+        if (issues.stream().anyMatch(Issue::isError)) {
+            throw new CodeValidateException(issues);
+        }
+
+        if (!issues.isEmpty()) {
+            warnings.addAll(issues);
+        }
+
         final JimpleInterpreterVisitor interpreterVisitor = new JimpleInterpreterVisitor(new JimpleContextImpl(stdout));
         return interpreterVisitor.visitProgram(parser.program());
     }
 
-    public Object eval(final Path path) throws IOException {
-        return eval(path, StandardCharsets.UTF_8);
+    public Object eval(final Path path, List<Issue> warnings) throws IOException, CodeValidateException {
+        return eval(path, StandardCharsets.UTF_8, warnings);
     }
 
-    public Object eval(final Path path, final Charset charset) throws IOException {
-        return eval(IOUtils.toString(path.toUri(), charset));
+    public Object eval(final Path path, final Charset charset, final List<Issue> warnings) throws IOException, CodeValidateException {
+        return eval(IOUtils.toString(path.toUri(), charset), path, warnings);
+    }
+
+    /**
+     * Validates Jimple source code
+     */
+    public List<Issue> validate(final Path path) throws IOException {
+        final String input = IOUtils.toString(path.toUri(), StandardCharsets.UTF_8);
+        return validate(input, path);
+    }
+
+    /**
+     * Validates Jimple source code
+     */
+    private static List<Issue> validate(final String input, final Path path) {
+        final JimpleLexer lexer = new JimpleLexer(CharStreams.fromString(input));
+        final JimpleParser parser = new JimpleParser(new CommonTokenStream(lexer));
+        final JimpleDiagnosticTool diagnosticTool = new JimpleDiagnosticTool(input, path);
+        // remove std listeners (e.g. ConsoleErrorListener)
+        lexer.removeErrorListeners();
+        parser.removeErrorListeners();
+        // add our listener
+        lexer.addErrorListener(diagnosticTool);
+        parser.addErrorListener(diagnosticTool);
+        diagnosticTool.visitProgram(parser.program());
+        return diagnosticTool.getIssues();
     }
 
     private static class VoidObject {

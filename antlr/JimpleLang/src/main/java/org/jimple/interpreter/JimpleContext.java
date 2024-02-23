@@ -9,6 +9,8 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 public interface JimpleContext {
 
+    boolean hasVar(TerminalNode identifier);
+
     Object getVarValue(TerminalNode identifier);
 
     void setVarValue(TerminalNode identifier, Object value);
@@ -18,6 +20,8 @@ public interface JimpleContext {
     void registerFunction(FunctionSignature functionSignature, BiFunction<FunctionSignature, List<Object>, Object> handler);
 
     BiFunction<FunctionSignature, List<Object>, Object> getFunction(FunctionSignature functionSignature);
+
+    List<FunctionInfo> getAllFunctions();
 
     void pushCallScope(Map<String, Object> variables);
 

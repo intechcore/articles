@@ -1,0 +1,52 @@
+println 12.3.1
+<----->
+ERROR: token recognition error at: '.'
+println 12.3.1
+            ^
+ERROR: extraneous input '1' expecting {<EOF>, 'var', 'println', 'return', '{', 'fun', 'if', IDENTIFIER}
+println 12.3.1
+             ^
+<----->
+println foo
+<----->
+ERROR: Identifier not found: foo
+println foo
+        ^
+<----->
+return foo
+<----->
+ERROR: Identifier not found: foo
+return foo
+       ^
+<----->
+return 1 + foo
+<----->
+ERROR: Identifier not found: foo
+return 1 + foo
+           ^
+<----->
+return (1 + foo)
+<----->
+ERROR: Identifier not found: foo
+return (1 + foo)
+            ^
+<----->
+return ((foo+2))
+<----->
+ERROR: Identifier not found: foo
+return ((foo+2))
+         ^
+<----->
+println ()
+<----->
+ERROR: mismatched input ')' expecting {'(', IDENTIFIER, NUMBER, DOUBLE_NUMBER, STRING_LITERAL}
+println ()
+         ^
+<----->
+var foo = 12
+return foo + bar
+<----->
+ERROR: Identifier not found: bar
+return foo + bar
+             ^
+<----->

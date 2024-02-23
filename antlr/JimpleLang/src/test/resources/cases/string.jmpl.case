@@ -34,13 +34,19 @@ true
 <----->
 println "foo" / "bar"
 <----->
-!ERROR: Expected number but found: String
+ERROR: Operator '/' not supported for such arguments: 'STRING' and 'STRING'
+println "foo" / "bar"
+              ^
 <----->
 println "foo" - 12
 <----->
-!ERROR: Operator '-' not supported for String
+ERROR: Operator '-' not supported for such arguments: 'STRING' and 'NUMBER'
+println "foo" - 12
+              ^
 <----->
 println 12 - ("foo")
 <----->
-!ERROR: Operator '-' not supported for String
+ERROR: Operator '-' not supported for such arguments: 'NUMBER' and 'STRING'
+println 12 - ("foo")
+           ^
 <----->

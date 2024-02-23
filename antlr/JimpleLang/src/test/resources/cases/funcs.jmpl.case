@@ -1,0 +1,133 @@
+if (more(3, 2)) {
+    println "3>2"
+}
+
+fun more(a, b) {
+    return a > b
+}
+<----->
+3>2
+<----->
+if (1) {
+    println "more"
+}
+<----->
+WARNING: The "if" condition must be of boolean type only. But found: NUMBER
+if (1) {
+    ^
+!ERROR: The "if" condition must be of boolean type only. But found: Long
+<----->
+println more(1)
+println more(1,2)
+println more(1,2,3)
+
+fun more(a, b) {
+    return a > b
+}
+<----->
+ERROR: Function with such signature not found: more
+println more(1)
+        ^
+ERROR: Function with such signature not found: more
+println more(1,2,3)
+        ^
+<----->
+if (3.14) {
+    println "more"
+}
+<----->
+WARNING: The "if" condition must be of boolean type only. But found: DOUBLE
+if (3.14) {
+    ^
+!ERROR: The "if" condition must be of boolean type only. But found: Double
+<----->
+if ("foo") {
+    println "more"
+}
+<----->
+WARNING: The "if" condition must be of boolean type only. But found: STRING
+if ("foo") {
+    ^
+!ERROR: The "if" condition must be of boolean type only. But found: String
+<----->
+println 123/minus(4,5)
+println 123/minus(5,4)
+println 123/minus(5,5)
+
+fun minus(a, b) {
+    return a - b
+}
+<----->
+-123
+123
+WARNING: Division by zero
+println 123/minus(5,5)
+           ^
+!ERROR: / by zero
+<----->
+println 42/divBy0(5,8)
+println 43/divBy0(6,7)
+
+fun divBy0(a, b) {
+    return b/(a - a)
+}
+<----->
+WARNING: Division by zero
+    return b/(a - a)
+            ^
+!ERROR: / by zero
+<----->
+println 45/alwaysZero(5,8)
+println 56/alwaysZero(6,7)
+
+fun alwaysZero(a, b) {
+    return (b-b)*(b - a)
+}
+<----->
+WARNING: Division by zero
+println 45/alwaysZero(5,8)
+          ^
+WARNING: Division by zero
+println 56/alwaysZero(6,7)
+          ^
+!ERROR: / by zero
+<----->
+println sum(5,8)
+
+fun sum(a, b) {
+    return a+b
+}
+fun mul(a, b) {
+    return a*b
+}
+<----->
+WARNING: Function declared but not used: mul
+fun mul(a, b) {
+    ^
+13
+<----->
+println rec(5,8)
+
+fun rec(a, b) {
+    return rec(b, a)
+}
+<----->
+WARNING: Recursive call of function 'rec' can lead to StackOverflow
+fun rec(a, b) {
+    ^
+!ERROR: StackOverflow
+<----->
+println abc(5,8)
+
+fun abc(a, b) {
+    return xyz(b, a)
+}
+fun xyz(a, b) {
+    return abc(b, a)
+}
+<----->
+WARNING: Recursive call of function 'abc' can lead to StackOverflow
+fun abc(a, b) {
+    ^
+!ERROR: StackOverflow
+<----->

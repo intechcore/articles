@@ -24,9 +24,13 @@ println 1+2*3
 <----->
 println 1/"1"
 <----->
-!ERROR: Expected number but found: String
+ERROR: Operator '/' not supported for such arguments: 'NUMBER' and 'STRING'
+println 1/"1"
+         ^
 <----->
 println "1"*2
 <----->
-!ERROR: Expected number but found: String
+ERROR: Operator '*' not supported for such arguments: 'STRING' and 'NUMBER'
+println "1"*2
+           ^
 <----->

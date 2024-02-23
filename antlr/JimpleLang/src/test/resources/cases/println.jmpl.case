@@ -15,3 +15,11 @@ println sum(5, 95)
 fun sum(a, b) {return a + b}
 <----->
 100
+<----->
+println sum(5, 95
+<----->
+ERROR: extraneous input '<EOF>' expecting {')', ','}
+
+ERROR: Function with such signature not found: sum
+println sum(5, 95
+        ^

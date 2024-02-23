@@ -22,7 +22,7 @@ public class FunctionDefinitionVisitor extends JimpleBaseVisitor<Object> {
     public Object visitFunctionDefinition(final JimpleParser.FunctionDefinitionContext ctx) {
         final String name = ctx.name.getText();
         final List<String> parameters = ctx.IDENTIFIER().stream().skip(1).map(ParseTree::getText).toList();
-        final var funcSig = new FunctionSignature(name, parameters.size(), ctx.getParent().getParent());
+        final var funcSig = FunctionSignature.of(name, parameters.size(), ctx);
         context.registerFunction(funcSig, (func, args) -> handler.handleFunc(func, parameters, args, ctx));
         return VOID;
     }

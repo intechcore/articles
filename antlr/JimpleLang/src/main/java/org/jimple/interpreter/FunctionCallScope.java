@@ -15,7 +15,9 @@ public record FunctionCallScope(Map<String, Object> variables, FunctionCallScope
             return variables.get(id);
         }
 
-        Objects.requireNonNull(parent, () -> "Variable not found: " + id);
+        if (parent == null) {
+            throw new IllegalStateException("Variable not found: " + id);
+        }
 
         return parent.getVarValue(id);
     }
@@ -34,7 +36,9 @@ public record FunctionCallScope(Map<String, Object> variables, FunctionCallScope
             return;
         }
 
-        Objects.requireNonNull(parent, () -> "Variable not found: " + id);
+        if (parent == null) {
+            throw new IllegalStateException("Variable not found: " + id);
+        }
 
         parent.setVarValue(id, value);
     }

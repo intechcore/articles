@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.jimple.lang.JimpleBaseVisitor;
 import org.jimple.lang.JimpleParser;
+import org.jimple.util.NumberUtil;
 
 import static org.jimple.interpreter.JimpleInterpreter.VOID;
 
@@ -44,7 +45,7 @@ public class JimpleInterpreterVisitor extends JimpleBaseVisitor<Object> implemen
     public Object visitFunctionCall(final JimpleParser.FunctionCallContext ctx) {
         final String name = ctx.IDENTIFIER().getText();
         final List<Object> arguments = ctx.expression().stream().map(this::visit).toList();
-        final FunctionSignature funSignature = new FunctionSignature(name, arguments.size(), ctx.getParent());
+        final FunctionSignature funSignature = FunctionSignature.of(name, arguments.size(), ctx);
         final var handler = context.getFunction(funSignature);
 
         if (handler == null) {
@@ -102,7 +103,7 @@ public class JimpleInterpreterVisitor extends JimpleBaseVisitor<Object> implemen
     public Object visitMulDivExpr(final JimpleParser.MulDivExprContext ctx) {
         final Number left = shouldBeNumber(visit(ctx.left));
         final Number right = shouldBeNumber(visit(ctx.right));
-        return evalBinaryOperator(left, right, ctx.op);
+        return NumberUtil.evalBinaryOperator(left, right, ctx.op);
     }
 
     @Override
@@ -111,7 +112,7 @@ public class JimpleInterpreterVisitor extends JimpleBaseVisitor<Object> implemen
         final Object right = shouldBeNumberString(visit(ctx.right));
 
         if (left instanceof Number && right instanceof Number) {
-            return evalBinaryOperator((Number) left, (Number) right, ctx.op);
+            return NumberUtil.evalBinaryOperator((Number) left, (Number) right, ctx.op);
         }
 
         if (ctx.op.getType() == JimpleParser.PLUS) {
@@ -204,14 +205,6 @@ public class JimpleInterpreterVisitor extends JimpleBaseVisitor<Object> implemen
         }
     }
 
-    private Number evalBinaryOperator(final Number left, final Number right, final Token operator) {
-        if (left instanceof Long && right instanceof Long) {
-            return evalLongOperator((Long) left, (Long) right, operator);
-        } else {
-            return evalDoubleOperator(left.doubleValue(), right.doubleValue(), operator);
-        }
-    }
-
     private Number shouldBeNumber(final Object obj) {
         if (obj instanceof Number) {
             return (Number) obj;
@@ -230,42 +223,6 @@ public class JimpleInterpreterVisitor extends JimpleBaseVisitor<Object> implemen
 
     private static String getTypeName(final Object obj) {
         return obj != null ? obj.getClass().getSimpleName() : "null";
-    }
-
-    private static Long evalLongOperator(final Long left, final Long right, final Token operator) {
-        switch (operator.getType()) {
-            case JimpleParser.PLUS -> {
-                return left + right;
-            }
-            case JimpleParser.MINUS -> {
-                return left - right;
-            }
-            case JimpleParser.SLASH -> {
-                return left / right;
-            }
-            case JimpleParser.ASTERISK -> {
-                return left * right;
-            }
-            default -> throw new IllegalStateException(UNSUPPORTED_OPERATOR + operator);
-        }
-    }
-
-    private static Double evalDoubleOperator(final Double left, final Double right, final Token operator) {
-        switch (operator.getType()) {
-            case JimpleParser.PLUS -> {
-                return left + right;
-            }
-            case JimpleParser.MINUS -> {
-                return left - right;
-            }
-            case JimpleParser.SLASH -> {
-                return left / right;
-            }
-            case JimpleParser.ASTERISK -> {
-                return left * right;
-            }
-            default -> throw new IllegalStateException(UNSUPPORTED_OPERATOR + operator);
-        }
     }
 
     private Boolean evalStringComparisonOperator(final String leftVal, final String rightVal, final Token operator) {
