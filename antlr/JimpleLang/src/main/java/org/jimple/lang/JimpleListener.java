@@ -1,4 +1,4 @@
-// Generated from Jimple.g4 by ANTLR 4.12.0
+// Generated from Jimple.g4 by ANTLR 4.13.2
 package org.jimple.lang;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -63,6 +63,18 @@ public interface JimpleListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitIdExp(JimpleParser.IdExpContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code booleanExpr}
+	 * labeled alternative in {@link JimpleParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterBooleanExpr(JimpleParser.BooleanExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code booleanExpr}
+	 * labeled alternative in {@link JimpleParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitBooleanExpr(JimpleParser.BooleanExprContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code compExpr}
 	 * labeled alternative in {@link JimpleParser#expression}.
@@ -186,6 +198,16 @@ public interface JimpleListener extends ParseTreeListener {
 	 */
 	void exitReturn(JimpleParser.ReturnContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link JimpleParser#returnVoid}.
+	 * @param ctx the parse tree
+	 */
+	void enterReturnVoid(JimpleParser.ReturnVoidContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link JimpleParser#returnVoid}.
+	 * @param ctx the parse tree
+	 */
+	void exitReturnVoid(JimpleParser.ReturnVoidContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link JimpleParser#blockStatement}.
 	 * @param ctx the parse tree
 	 */
@@ -235,4 +257,14 @@ public interface JimpleListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitElseStatement(JimpleParser.ElseStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link JimpleParser#whileStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterWhileStatement(JimpleParser.WhileStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link JimpleParser#whileStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitWhileStatement(JimpleParser.WhileStatementContext ctx);
 }

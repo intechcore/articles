@@ -62,7 +62,7 @@ public class JimpleInterpreter {
         final JimpleLexer lexer = new JimpleLexer(CharStreams.fromString(input));
         final JimpleParser parser = new JimpleParser(new CommonTokenStream(lexer));
 
-        final List<Issue> issues = validate(input, path);
+        final List<Issue> issues = JimpleDiagnosticTool.validate(input, path);
 
         if (issues.stream().anyMatch(Issue::isError)) {
             throw new CodeValidateException(issues);
@@ -84,30 +84,6 @@ public class JimpleInterpreter {
         return eval(IOUtils.toString(path.toUri(), charset), path, warnings);
     }
 
-    /**
-     * Validates Jimple source code
-     */
-    public List<Issue> validate(final Path path) throws IOException {
-        final String input = IOUtils.toString(path.toUri(), StandardCharsets.UTF_8);
-        return validate(input, path);
-    }
-
-    /**
-     * Validates Jimple source code
-     */
-    private static List<Issue> validate(final String input, final Path path) {
-        final JimpleLexer lexer = new JimpleLexer(CharStreams.fromString(input));
-        final JimpleParser parser = new JimpleParser(new CommonTokenStream(lexer));
-        final JimpleDiagnosticTool diagnosticTool = new JimpleDiagnosticTool(input, path);
-        // remove std listeners (e.g. ConsoleErrorListener)
-        lexer.removeErrorListeners();
-        parser.removeErrorListeners();
-        // add our listener
-        lexer.addErrorListener(diagnosticTool);
-        parser.addErrorListener(diagnosticTool);
-        diagnosticTool.visitProgram(parser.program());
-        return diagnosticTool.getIssues();
-    }
 
     private static class VoidObject {
         @Override

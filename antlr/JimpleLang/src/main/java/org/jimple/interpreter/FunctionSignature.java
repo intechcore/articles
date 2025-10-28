@@ -1,8 +1,11 @@
 package org.jimple.interpreter;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jimple.compiler.CompilationInfo;
 import org.jimple.lang.JimpleParser;
 
 /**
@@ -12,7 +15,7 @@ import org.jimple.lang.JimpleParser;
  * @param paramCount parameter count
  * @param context    context of function definition or call
  */
-public record FunctionSignature(String name, int paramCount, ParserRuleContext context) {
+public record FunctionSignature(String name, int paramCount, Map<String, CompilationInfo> methods, ParserRuleContext context, NativeFuncInfo nativeInfo) {
     public FunctionSignature {
         Objects.requireNonNull(context, "context");
     }
@@ -21,15 +24,27 @@ public record FunctionSignature(String name, int paramCount, ParserRuleContext c
      * Returns new instance with specified context
      */
     public FunctionSignature withContext(final ParserRuleContext context) {
-        return new FunctionSignature(name, paramCount, context);
+        return new FunctionSignature(name, paramCount, methods, context, nativeInfo);
     }
 
     public static FunctionSignature of(final String name, final int paramCount, final JimpleParser.FunctionDefinitionContext funDefCtx) {
-        return new FunctionSignature(name, paramCount, funDefCtx);
+        return new FunctionSignature(name, paramCount, new LinkedHashMap<>(1), funDefCtx, null);
     }
 
     public static FunctionSignature of(final String name, final int paramCount, final JimpleParser.FunctionCallContext funCallCtx) {
-        return new FunctionSignature(name, paramCount, funCallCtx);
+        return new FunctionSignature(name, paramCount, new LinkedHashMap<>(1), funCallCtx, null);
+    }
+
+    public static FunctionSignature ofNative(final String name, final int paramCount, final ParserRuleContext funCallCtx, final NativeFuncInfo nativeFuncInfo) {
+        return new FunctionSignature(name, paramCount, new LinkedHashMap<>(1), funCallCtx, nativeFuncInfo);
+    }
+
+    public boolean isNative() {
+        return nativeInfo != null;
+    }
+
+    public boolean isNonNative() {
+        return !isNative();
     }
 
     private ParserRuleContext getNextParent() {

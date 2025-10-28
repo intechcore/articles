@@ -1,4 +1,4 @@
-// Generated from Jimple.g4 by ANTLR 4.12.0
+// Generated from Jimple.g4 by ANTLR 4.13.2
 package org.jimple.lang;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -72,6 +72,18 @@ public class JimpleBaseListener implements JimpleListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitIdExp(JimpleParser.IdExpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBooleanExpr(JimpleParser.BooleanExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBooleanExpr(JimpleParser.BooleanExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -209,6 +221,18 @@ public class JimpleBaseListener implements JimpleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterReturnVoid(JimpleParser.ReturnVoidContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitReturnVoid(JimpleParser.ReturnVoidContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterBlockStatement(JimpleParser.BlockStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -264,6 +288,18 @@ public class JimpleBaseListener implements JimpleListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitElseStatement(JimpleParser.ElseStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterWhileStatement(JimpleParser.WhileStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitWhileStatement(JimpleParser.WhileStatementContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

@@ -1,0 +1,84 @@
+var counter = 5
+
+while(counter > 0) {
+    println counter
+    counter = counter - 1
+}
+println "Done"
+<----->
+5
+4
+3
+2
+1
+Done
+<----->
+var counter = 5
+
+while(true) {
+    println counter
+    counter = counter - 1
+    if (counter <= 0) {
+        println "Done"
+        return
+    }
+}
+println "Not expected"
+<----->
+5
+4
+3
+2
+1
+Done
+<----->
+var counter = 10
+
+while(counter > 0) {
+    factorial(counter)
+    counter = counter - 1
+}
+
+fun factorial(n) {
+    if (n == 0) {
+        return 1
+    }
+    return n * factorial(n-1)
+}
+
+println "Done"
+<----->
+WARNING: Recursive call of function 'factorial' can lead to StackOverflow
+fun factorial(n) {
+    ^
+Done
+<----->
+var counter = 0
+var lastFactorial = 0
+var startTime = now()
+
+while(counter < 1000000) {
+    lastFactorial = factorial(counter % 20 + lastFactorial % 5)
+    counter = counter + 1
+}
+
+var time = now() - startTime
+println "lastFactorial: " + lastFactorial
+println "counter: " + counter
+//println "time: " + time
+println "Done"
+
+fun factorial(n) {
+    if (n == 0) {
+        return 1
+    }
+    return n * factorial(n-1)
+}
+<----->
+WARNING: Recursive call of function 'factorial' can lead to StackOverflow
+fun factorial(n) {
+    ^
+lastFactorial: 121645100408832000
+counter: 1000000
+Done
+<----->

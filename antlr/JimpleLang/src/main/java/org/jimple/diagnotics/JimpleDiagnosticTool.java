@@ -1,10 +1,12 @@
 package org.jimple.diagnotics;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.antlr.v4.runtime.ANTLRErrorListener;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
@@ -20,6 +24,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullPrintStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -29,6 +34,7 @@ import org.jimple.interpreter.FunctionSignature;
 import org.jimple.interpreter.JimpleContext;
 import org.jimple.interpreter.JimpleContextImpl;
 import org.jimple.lang.JimpleBaseVisitor;
+import org.jimple.lang.JimpleLexer;
 import org.jimple.lang.JimpleParser;
 import org.jimple.util.NumberUtil;
 
@@ -57,6 +63,31 @@ public class JimpleDiagnosticTool extends JimpleBaseVisitor<ValidationInfo> impl
         this.context = new JimpleContextImpl(new NullPrintStream());
     }
 
+    /**
+     * Validates Jimple source code
+     */
+    public static List<Issue> validate(final Path path) throws IOException {
+        final String input = IOUtils.toString(path.toUri(), StandardCharsets.UTF_8);
+        return validate(input, path);
+    }
+
+    /**
+     * Validates Jimple source code
+     */
+    public static List<Issue> validate(final String input, final Path path) {
+        final JimpleLexer lexer = new JimpleLexer(CharStreams.fromString(input));
+        final JimpleParser parser = new JimpleParser(new CommonTokenStream(lexer));
+        final JimpleDiagnosticTool diagnosticTool = new JimpleDiagnosticTool(input, path);
+        // remove std listeners (e.g. ConsoleErrorListener)
+        lexer.removeErrorListeners();
+        parser.removeErrorListeners();
+        // add our listener
+        lexer.addErrorListener(diagnosticTool);
+        parser.addErrorListener(diagnosticTool);
+        diagnosticTool.visitProgram(parser.program());
+        return diagnosticTool.getIssues();
+    }
+
     public List<Issue> getIssues() {
         return issues.stream().toList();
     }
@@ -72,7 +103,7 @@ public class JimpleDiagnosticTool extends JimpleBaseVisitor<ValidationInfo> impl
 
     private void checkUnusedFunctions() {
         context.getAllFunctions().stream()
-                .filter(func -> func.calledCount() <= 0)
+                .filter(func -> func.calledCount() <= 0 && func.signature().isNonNative())
                 .forEach(info -> {
                     final JimpleParser.FunctionDefinitionContext funDefCtx = (JimpleParser.FunctionDefinitionContext) info.signature().context();
                     addIssue(IssueType.WARNING, funDefCtx.name, "Function declared but not used: " + info.signature().name());
@@ -388,6 +419,10 @@ public class JimpleDiagnosticTool extends JimpleBaseVisitor<ValidationInfo> impl
      */
     @Override
     public Object handleFunc(final FunctionSignature func, final List<String> parameters, final List<Object> arguments, final JimpleParser.FunctionDefinitionContext ctx) {
+        if (func.nativeInfo() != null) {
+            return func.nativeInfo().interpreterReturnType();
+        }
+
         // TODO: use another strategy to check func definition may be in visitFunctionDefinition
         if (!checkedFuncs.contains(ctx)) {
             // if function is not checked yet, check it only once
@@ -434,7 +469,7 @@ public class JimpleDiagnosticTool extends JimpleBaseVisitor<ValidationInfo> impl
             return ValidationInfo.SKIP;
         }
         calledFuncs.add(ctx);
-        final Map<String, Object> variables = new HashMap<>(parameters.size());
+        final Map<String, Object> variables = new LinkedHashMap<>(parameters.size());
         for (int i = 0; i < parameters.size(); i++) {
             variables.put(parameters.get(i), arguments.get(i));
         }

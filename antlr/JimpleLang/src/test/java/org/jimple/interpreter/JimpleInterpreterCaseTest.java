@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,7 +26,7 @@ class JimpleInterpreterCaseTest {
     private final TestCaseParser parser = new TestCaseParser();
 
     @ParameterizedTest
-    @ValueSource(strings = {"println", "number", "string", "scopes", "funcs"})
+    @ValueSource(strings = {"println", "number", "string", "scopes", "funcs", "while", "if"})
     void testAllCases(final String name) throws IOException {
         final String resourcePath = "/cases/" + name + ".jmpl.case";
         runResource(resourcePath);
@@ -50,15 +52,27 @@ class JimpleInterpreterCaseTest {
                 final String warningsOutput = warnings.isEmpty() ? "" : IssueUtil.issuesToString(warnings);
                 final String actualStdout = stdout.toString(StandardCharsets.UTF_8);
 
-                assertEquals(JimpleInterpreter.VOID, result, "script should return nothing");
+                if (result instanceof JimpleInterpreterVisitor.ReturnResult returnResult) {
+                    final Object resultValue = returnResult.result();
+                    if (!(resultValue instanceof Long)) {
+                        assertEquals(JimpleInterpreter.VOID, resultValue, "script should return nothing or number");
+                    } else {
+                        log.info("Script returned: {}", resultValue);
+                    }
+                } else {
+                    assertEquals(JimpleInterpreter.VOID, result, "script should return nothing or number");
+                }
                 assertEquals(testCase.expectedOutput(), warningsOutput + actualStdout);
             } catch (CodeValidateException ex) {
                 assertEquals(testCase.expectedOutput(), IssueUtil.issuesToString(ex.getIssues()));
+            } catch (AssertionError ex) {
+                // assert errors rethrow, shouldn't catch byt the next Throwable
+                throw ex;
             } catch (Throwable ex) {
                 final String actualStdout = stdout.toString(StandardCharsets.UTF_8);
                 final String warningsOutput = warnings.isEmpty() ? "" : IssueUtil.issuesToString(warnings);
                 final String errorOutput = actualStdout + warningsOutput + "!ERROR: "
-                        + (ex instanceof StackOverflowError ? "StackOverflow" : ex.getMessage());
+                        + (ex instanceof StackOverflowError ? "StackOverflowError" : ex.getMessage());
                 log.error("Script eval failed: {}", testCase.jimpleCode(), ex);
                 assertEquals(testCase.expectedOutput().trim(), errorOutput);
             }

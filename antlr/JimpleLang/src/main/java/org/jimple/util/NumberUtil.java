@@ -29,6 +29,9 @@ public final class NumberUtil {
             case JimpleParser.ASTERISK -> {
                 return left * right;
             }
+            case JimpleParser.MOD -> {
+                return left % right;
+            }
             default -> throw new IllegalStateException(UNSUPPORTED_OPERATOR + operator);
         }
     }

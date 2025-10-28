@@ -3,6 +3,7 @@ package org.jimple.interpreter;
 import java.util.List;
 
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.jimple.compiler.CompilationInfo;
 import org.jimple.lang.JimpleBaseVisitor;
 import org.jimple.lang.JimpleParser;
 
@@ -25,5 +26,22 @@ public class FunctionDefinitionVisitor extends JimpleBaseVisitor<Object> {
         final var funcSig = FunctionSignature.of(name, parameters.size(), ctx);
         context.registerFunction(funcSig, (func, args) -> handler.handleFunc(func, parameters, args, ctx));
         return VOID;
+    }
+
+    @Override
+    public Object visitProgram(final JimpleParser.ProgramContext ctx) {
+        // list of native functions
+        final NativeFuncInfo nowNativeHandler = new NativeFuncInfo(System.class.getName().replace('.', '/'), "currentTimeMillis", this::handleNow, CompilationInfo.NUMBER, List.of());
+        context.registerFunction(FunctionSignature.ofNative("now", 0, ctx, nowNativeHandler), (func, args) -> handler.handleFunc(func, List.of(), args, null));
+
+        return super.visitProgram(ctx);
+    }
+
+    private Object handleNow(final FunctionSignature func, final List<Object> args) {
+        if (!args.isEmpty()) {
+            throw new IllegalStateException("In function '" + func.name() + "' expected empty arguments but found: " + args);
+        }
+
+        return System.currentTimeMillis();
     }
 }

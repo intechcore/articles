@@ -26,3 +26,7 @@ buildNumber.properties
 
 /lib
 .antlr
+
+
+*.exe
+*.dll

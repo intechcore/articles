@@ -1,17 +1,19 @@
 package org.jimple.interpreter;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.jimple.lang.JimpleBaseVisitor;
 import org.jimple.lang.JimpleParser;
 import org.jimple.util.NumberUtil;
+import org.jimple.util.StringUtil;
 
 import static org.jimple.interpreter.JimpleInterpreter.VOID;
 
@@ -62,7 +64,13 @@ public class JimpleInterpreterVisitor extends JimpleBaseVisitor<Object> implemen
 
     @Override
     public Object visitReturn(final JimpleParser.ReturnContext ctx) {
-        return visit(ctx.expression());
+        final Object result = visit(ctx.expression());
+        return new ReturnResult(result, false);
+    }
+
+    @Override
+    public Object visitReturnVoid(final JimpleParser.ReturnVoidContext ctx) {
+        return new ReturnResult(VOID, true);
     }
 
     @Override
@@ -79,7 +87,7 @@ public class JimpleInterpreterVisitor extends JimpleBaseVisitor<Object> implemen
 
     @Override
     public Object visitStringExpr(final JimpleParser.StringExprContext ctx) {
-        return cleanStringLiteral(ctx.STRING_LITERAL().getText());
+        return StringUtil.cleanStringLiteral(ctx.STRING_LITERAL().getText());
     }
 
     @Override
@@ -124,21 +132,58 @@ public class JimpleInterpreterVisitor extends JimpleBaseVisitor<Object> implemen
     }
 
     @Override
+    public Object visitBooleanExpr(JimpleParser.BooleanExprContext ctx) {
+        return "true".equals(ctx.BOOLEAN().getText());
+    }
+
+    @Override
     public Object visitIfStatement(final JimpleParser.IfStatementContext ctx) {
         final Object condition = visit(ctx.expression());
         if (!(condition instanceof Boolean)) {
             throw new IllegalStateException("The \"if\" condition must be of boolean type only. But found: " + getTypeName(condition));
         }
 
+        Object result = null;
         if (Boolean.TRUE.equals(condition)) {
-            visit(ctx.statement());
+            result = visit(ctx.statement());
         } else {
             final JimpleParser.ElseStatementContext elseStatement = ctx.elseStatement();
             if (elseStatement != null) {
-                visit(elseStatement);
+                result = visit(elseStatement);
             }
         }
+        if (result instanceof final ReturnResult returnResult) {
+            // one of the if/else blocks returned the value
+            return returnResult;
+        }
         return VOID;
+    }
+
+    @Override
+    public Object visitWhileStatement(final JimpleParser.WhileStatementContext ctx) {
+        Object condition = visit(ctx.expression());
+        Object result = null;
+        while(true) {
+            if (!(condition instanceof Boolean)) {
+                throw new IllegalStateException("The \"while\" condition must be of boolean type only. But found: " + getTypeName(condition));
+            }
+            if (Boolean.FALSE.equals(condition)) {
+                break;
+            }
+            result = visit(ctx.statement());
+            if (result instanceof final ReturnResult returnResult) {
+                // block of the while statement returned the value
+                return returnResult;
+            }
+            condition = visit(ctx.expression());
+        }
+
+        return VOID;
+    }
+
+    @Override
+    protected boolean shouldVisitNextChild(final RuleNode node, final Object currentResult) {
+        return !(currentResult instanceof ReturnResult);
     }
 
     @Override
@@ -174,7 +219,11 @@ public class JimpleInterpreterVisitor extends JimpleBaseVisitor<Object> implemen
     public Object handleFunc(final FunctionSignature func, final List<String> parameters, final List<Object> arguments, final JimpleParser.FunctionDefinitionContext ctx) {
         Validate.isTrue(parameters.size() == arguments.size(), "parameters size != arguments size");
 
-        final Map<String, Object> variables = new HashMap<>(parameters.size());
+        if (func.nativeInfo() != null) {
+            return func.nativeInfo().interpreterHandler().apply(func, arguments);
+        }
+
+        final Map<String, Object> variables = new LinkedHashMap<>(parameters.size());
         for (int i = 0; i < parameters.size(); i++) {
             variables.put(parameters.get(i), arguments.get(i));
         }
@@ -186,6 +235,11 @@ public class JimpleInterpreterVisitor extends JimpleBaseVisitor<Object> implemen
         for (int i = 0; i < statements.size(); i++) {
             final JimpleParser.StatementContext statement = statements.get(i);
             final Object result = visit(statement);
+            if (result instanceof final ReturnResult returnResult) {
+                // one of the if/else blocks returned the value
+                lastResult = returnResult.isVoid() ? VOID : returnResult.result();
+                break;
+            }
             if (i == statements.size() - 1) {
                 lastResult = result;
             }
@@ -222,7 +276,22 @@ public class JimpleInterpreterVisitor extends JimpleBaseVisitor<Object> implemen
     }
 
     private static String getTypeName(final Object obj) {
-        return obj != null ? obj.getClass().getSimpleName() : "null";
+        if (obj == null) {
+            return "null";
+        }
+
+        final Class<?> objClass = obj.getClass();
+        if (objClass == String.class) {
+            return "STRING";
+        } else if (objClass == Long.class) {
+            return "NUMBER";
+        } else if (objClass == Double.class) {
+            return "DOUBLE";
+        } else if (objClass == Boolean.class) {
+            return "BOOLEAN";
+        }
+
+        throw new IllegalStateException("TODO: " + objClass);
     }
 
     private Boolean evalStringComparisonOperator(final String leftVal, final String rightVal, final Token operator) {
@@ -285,7 +354,9 @@ public class JimpleInterpreterVisitor extends JimpleBaseVisitor<Object> implemen
         return value;
     }
 
-    private static String cleanStringLiteral(final String literal) {
-        return literal.length() > 1 ? literal.substring(1, literal.length() - 1) : literal;
+    /**
+     * Represents return value or void if the function returns nothing.
+     */
+    public record ReturnResult(Object result, boolean isVoid) {
     }
 }

@@ -8,14 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jimple.diagnotics.Issue;
+import org.jimple.diagnotics.JimpleDiagnosticTool;
 
 /**
- * Entry point of executing jimple interpreter.
+ * Entry point of executing Jimple interpreter.
  */
 public final class MainApp {
     public static void main(final String[] args) throws IOException {
         if (args.length < 1) {
-            System.out.println("usage: jimple input.jimple");
+            System.out.println("Jimple Interpreter v1.2");
+            System.out.println("usage: jimple <jimple_script>");
             System.exit(1);
         }
 
@@ -28,10 +30,11 @@ public final class MainApp {
         final JimpleInterpreter interpreter = new JimpleInterpreter();
 
         try {
-            final List<Issue> issues = interpreter.validate(path);
+            final List<Issue> issues = JimpleDiagnosticTool.validate(path);
 
             if (!issues.isEmpty()) {
                 System.err.println("Found issues: ");
+                boolean hasErrors = false;
                 for (int i = 0; i < issues.size(); i++) {
                     final Issue issue = issues.get(i);
                     System.err.println(String.format("%s (%d:%d): %s", issue.type(), issue.lineNumber(), issue.lineOffset(),
@@ -39,8 +42,13 @@ public final class MainApp {
                     if (!issue.details().isEmpty()) {
                         System.err.println(issue.details());
                     }
+                    if (issue.isError()) {
+                        hasErrors = true;
+                    }
                 }
-                System.exit(1);
+                if (hasErrors) {
+                    System.exit(1);
+                }
             }
         } catch (final Exception ex) {
             System.err.println("Code validate failed: " + ex.getMessage());

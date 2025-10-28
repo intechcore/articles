@@ -1,54 +1,96 @@
-if (more(3, 2)) {
+println "fact(5)=" + factorial(5)
+
+fun factorial(n) {
+    if (n == 0) {
+        return 1
+    }
+    return n * factorial(n-1)
+}
+<----->
+WARNING: Recursive call of function 'factorial' can lead to StackOverflow
+fun factorial(n) {
+    ^
+fact(5)=120
+<----->
+fun print(a) {
+    println a
+}
+
+print("aBC")
+<----->
+aBC
+<----->
+print("XyZ")
+
+fun print(a) {
+    println a
+}
+<----->
+XyZ
+<----->
+if (greater(3, 2)) {
     println "3>2"
 }
 
-fun more(a, b) {
+fun greater(a, b) {
     return a > b
 }
 <----->
 3>2
 <----->
+if (greater(2, 4)) {
+    println "2>4"
+} else {
+    println "2<4"
+}
+
+fun greater(a, b) {
+    return a > b
+}
+<----->
+2<4
+<----->
 if (1) {
-    println "more"
+    println "greater"
 }
 <----->
 WARNING: The "if" condition must be of boolean type only. But found: NUMBER
 if (1) {
     ^
-!ERROR: The "if" condition must be of boolean type only. But found: Long
+!ERROR: The "if" condition must be of boolean type only. But found: NUMBER
 <----->
-println more(1)
-println more(1,2)
-println more(1,2,3)
+println greater(1)
+println greater(1,2)
+println greater(1,2,3)
 
-fun more(a, b) {
+fun greater(a, b) {
     return a > b
 }
 <----->
-ERROR: Function with such signature not found: more
-println more(1)
+ERROR: Function with such signature not found: greater
+println greater(1)
         ^
-ERROR: Function with such signature not found: more
-println more(1,2,3)
+ERROR: Function with such signature not found: greater
+println greater(1,2,3)
         ^
 <----->
 if (3.14) {
-    println "more"
+    println "greater"
 }
 <----->
 WARNING: The "if" condition must be of boolean type only. But found: DOUBLE
 if (3.14) {
     ^
-!ERROR: The "if" condition must be of boolean type only. But found: Double
+!ERROR: The "if" condition must be of boolean type only. But found: DOUBLE
 <----->
 if ("foo") {
-    println "more"
+    println "greater"
 }
 <----->
 WARNING: The "if" condition must be of boolean type only. But found: STRING
 if ("foo") {
     ^
-!ERROR: The "if" condition must be of boolean type only. But found: String
+!ERROR: The "if" condition must be of boolean type only. But found: STRING
 <----->
 println 123/minus(4,5)
 println 123/minus(5,4)
@@ -92,6 +134,16 @@ println 56/alwaysZero(6,7)
           ^
 !ERROR: / by zero
 <----->
+println sum(4, 2)
+println sum("4", "2")
+
+fun sum(a, b) {
+    return a+b
+}
+<----->
+6
+42
+<----->
 println sum(5,8)
 
 fun sum(a, b) {
@@ -115,7 +167,19 @@ fun rec(a, b) {
 WARNING: Recursive call of function 'rec' can lead to StackOverflow
 fun rec(a, b) {
     ^
-!ERROR: StackOverflow
+!ERROR: StackOverflowError
+<----->
+println rec(5,8)
+
+fun rec(a, b) {
+    rec(b, a)
+    return ""
+}
+<----->
+WARNING: Recursive call of function 'rec' can lead to StackOverflow
+fun rec(a, b) {
+    ^
+!ERROR: StackOverflowError
 <----->
 println abc(5,8)
 
@@ -129,5 +193,5 @@ fun xyz(a, b) {
 WARNING: Recursive call of function 'abc' can lead to StackOverflow
 fun abc(a, b) {
     ^
-!ERROR: StackOverflow
+!ERROR: StackOverflowError
 <----->

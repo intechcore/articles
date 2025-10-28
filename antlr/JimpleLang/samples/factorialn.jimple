@@ -1,0 +1,30 @@
+var counter = 0
+var lastFactorial = 0
+
+// warming up the JVM
+while(counter < 1000000) {
+    lastFactorial = factorial(counter % 20 + lastFactorial % 5)
+    counter = counter + 1
+}
+
+// running benchmark
+counter = 0
+lastFactorial = 0
+var startTime = now()
+
+while(counter < 1000000) {
+    lastFactorial = factorial(counter % 20 + lastFactorial % 5)
+    counter = counter + 1
+}
+
+var time = now() - startTime
+println "lastFactorial: " + lastFactorial
+println "counter: " + counter
+println "time: " + time
+
+fun factorial(n) {
+    if (n == 0) {
+        return 1
+    }
+    return n * factorial(n-1)
+}

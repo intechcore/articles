@@ -1,12 +1,22 @@
 var result = 9 + 10
 
 println "Result is " + add(result, 21)
+println add(result, 9) + " <<"
 
 fun add(a, b) {
     return a + b
 }
 <----->
 Result is 40
+28 <<
+<----->
+println ("12" + " 145")
+<----->
+12 145
+<----->
+println ("12") < ("145")
+<----->
+true
 <----->
 println "12" > "145"
 <----->
@@ -31,6 +41,34 @@ false
 println "5" <= "5"
 <----->
 true
+<----->
+println "5" == "5"
+<----->
+true
+<----->
+println "5" == "6"
+<----->
+false
+<----->
+println "12" != "126"
+<----->
+true
+<----->
+println "124" != "124"
+<----->
+false
+<----->
+println 125 <= "124"
+<----->
+ERROR: Operator '<=' not supported for such arguments: 'NUMBER' and 'STRING'
+println 125 <= "124"
+            ^
+<----->
+println "125" > 124
+<----->
+ERROR: Operator '>' not supported for such arguments: 'STRING' and 'NUMBER'
+println "125" > 124
+              ^
 <----->
 println "foo" / "bar"
 <----->

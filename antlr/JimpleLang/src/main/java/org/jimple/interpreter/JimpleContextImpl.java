@@ -2,10 +2,9 @@ package org.jimple.interpreter;
 
 import java.io.PrintStream;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,20 +12,20 @@ import java.util.function.BiFunction;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.jimple.lang.JimpleParser;
+import org.jimple.compiler.CompilationInfo;
 
 public class JimpleContextImpl implements JimpleContext {
     // mapping of function handler to function signature
     private final Map<FunctionSignature, BiFunction<FunctionSignature, List<Object>, Object>> functions = new HashMap<>(0);
     // statistics by functions call
     private final Map<FunctionSignature, Integer> functionsCalledCount = new HashMap<>(0);
-    private final Deque<FunctionCallScope> callScopes = new ArrayDeque<>(0);
+    private final Deque<BlockCallScope> callScopes = new ArrayDeque<>(0);
     private final PrintStream stdout;
 
     public JimpleContextImpl(final PrintStream stdout) {
         this.stdout = stdout;
         // set global frame
-        callScopes.add(new FunctionCallScope(new HashMap<>(0), null));
+        callScopes.add(new BlockCallScope(new LinkedHashMap<>(0), null, true));
     }
 
     @Override
@@ -40,13 +39,30 @@ public class JimpleContextImpl implements JimpleContext {
     }
 
     @Override
+    public int getVarIndex(final TerminalNode identifier) {
+        return getLastScope().getVarIndex(identifier.getText());
+    }
+
+    @Override
+    public CompilationInfo getVarType(final TerminalNode identifier) {
+        return getLastScope().getVarType(identifier.getText());
+    }
+
+    @Override
     public void setVarValue(final TerminalNode identifier, final Object value) {
         getLastScope().setVarValue(identifier.getText(), value);
     }
 
     @Override
-    public void registerVariable(final TerminalNode identifier, final Object value) {
-        getLastScope().registerVariable(identifier.getText(), value);
+    public BlockCallScope registerVariable(final TerminalNode identifier, final Object value) {
+        return registerVariable(identifier.getText(), value);
+    }
+
+    @Override
+    public BlockCallScope registerVariable(final String identifier, final Object value) {
+        final BlockCallScope lastScope = getLastScope();
+        lastScope.registerVariable(identifier, value);
+        return lastScope;
     }
 
     @Override
@@ -57,7 +73,7 @@ public class JimpleContextImpl implements JimpleContext {
 
         functions.put(funcSignature, (sig, list) -> {
             functionsCalledCount.put(funcSignature, 1 + functionsCalledCount.getOrDefault(funcSignature, 0));
-            return handler.apply(sig, list);
+            return handler.apply(funcSignature, list);
         });
     }
 
@@ -83,6 +99,32 @@ public class JimpleContextImpl implements JimpleContext {
     }
 
     @Override
+    public FunctionSignature getFunctionSig(final FunctionSignature funcSignature) {
+        if (functions.containsKey(funcSignature)) {
+            // we should return original function signature with definition context
+            for (final FunctionSignature functionSignature : functions.keySet()) {
+                if (functionSignature.equals(funcSignature)) {
+                    return functionSignature;
+                }
+            }
+        }
+
+        // walk up all parents to find function
+        ParserRuleContext context = funcSignature.context().getParent();
+        while (context != null) {
+            final FunctionSignature foundSig = funcSignature.withContext(context);
+            for (final FunctionSignature functionSignature : functions.keySet()) {
+                if (foundSig.equals(functionSignature)) {
+                    return functionSignature;
+                }
+            }
+            context = context.getParent();
+        }
+
+        return null;
+    }
+
+    @Override
     public List<FunctionInfo> getAllFunctions() {
         return functions.keySet().stream()
                 .map(signature -> new FunctionInfo(signature, functionsCalledCount.getOrDefault(signature, 0)))
@@ -91,7 +133,7 @@ public class JimpleContextImpl implements JimpleContext {
 
     @Override
     public void pushCallScope(final Map<String, Object> variables) {
-        callScopes.push(new FunctionCallScope(variables, null));
+        callScopes.push(new BlockCallScope(variables, null, true));
     }
 
     @Override
@@ -113,7 +155,7 @@ public class JimpleContextImpl implements JimpleContext {
      */
     @Override
     public void pushBlockScope() {
-        callScopes.push(new FunctionCallScope(new HashMap<>(0), getLastScope()));
+        callScopes.push(new BlockCallScope(new LinkedHashMap<>(0), getLastScope(), false));
     }
 
     /**
@@ -126,7 +168,7 @@ public class JimpleContextImpl implements JimpleContext {
         callScopes.pop();
     }
 
-    private FunctionCallScope getLastScope() {
+    private BlockCallScope getLastScope() {
         if (callScopes.isEmpty()) {
             throw new IllegalStateException("Call frame not found");
         }

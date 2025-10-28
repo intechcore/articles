@@ -1,0 +1,4 @@
+var foo = "BaR!"
+println "Hello, " + foo
+<----->
+Hello, BaR!

@@ -1,4 +1,4 @@
-// Generated from Jimple.g4 by ANTLR 4.12.0
+// Generated from Jimple.g4 by ANTLR 4.13.2
 package org.jimple.lang;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -43,6 +43,13 @@ public interface JimpleVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitIdExp(JimpleParser.IdExpContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code booleanExpr}
+	 * labeled alternative in {@link JimpleParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBooleanExpr(JimpleParser.BooleanExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code compExpr}
 	 * labeled alternative in {@link JimpleParser#expression}.
@@ -116,6 +123,12 @@ public interface JimpleVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitReturn(JimpleParser.ReturnContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link JimpleParser#returnVoid}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitReturnVoid(JimpleParser.ReturnVoidContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link JimpleParser#blockStatement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -145,4 +158,10 @@ public interface JimpleVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitElseStatement(JimpleParser.ElseStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link JimpleParser#whileStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWhileStatement(JimpleParser.WhileStatementContext ctx);
 }

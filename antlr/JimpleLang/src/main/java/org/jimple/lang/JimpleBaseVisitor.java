@@ -1,4 +1,4 @@
-// Generated from Jimple.g4 by ANTLR 4.12.0
+// Generated from Jimple.g4 by ANTLR 4.13.2
 package org.jimple.lang;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -47,6 +47,13 @@ public class JimpleBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitIdExp(JimpleParser.IdExpContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitBooleanExpr(JimpleParser.BooleanExprContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -130,6 +137,13 @@ public class JimpleBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitReturnVoid(JimpleParser.ReturnVoidContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitBlockStatement(JimpleParser.BlockStatementContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -159,4 +173,11 @@ public class JimpleBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitElseStatement(JimpleParser.ElseStatementContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitWhileStatement(JimpleParser.WhileStatementContext ctx) { return visitChildren(ctx); }
 }

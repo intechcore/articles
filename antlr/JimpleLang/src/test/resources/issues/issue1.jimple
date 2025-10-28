@@ -3,7 +3,7 @@ println 12.3.1
 ERROR: token recognition error at: '.'
 println 12.3.1
             ^
-ERROR: extraneous input '1' expecting {<EOF>, 'var', 'println', 'return', '{', 'fun', 'if', IDENTIFIER}
+ERROR: extraneous input '1' expecting {<EOF>, 'var', 'println', 'return', '{', 'fun', 'if', 'while', IDENTIFIER}
 println 12.3.1
              ^
 <----->
@@ -39,7 +39,7 @@ return ((foo+2))
 <----->
 println ()
 <----->
-ERROR: mismatched input ')' expecting {'(', IDENTIFIER, NUMBER, DOUBLE_NUMBER, STRING_LITERAL}
+ERROR: mismatched input ')' expecting {'(', BOOLEAN, IDENTIFIER, NUMBER, DOUBLE_NUMBER, STRING_LITERAL}
 println ()
          ^
 <----->
