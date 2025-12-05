@@ -1,6 +1,12 @@
 # Jimple - Simple interpreter and compiler in Java 
 
-This project is a simple interpreter implemented in Java using [ANTLR](https://www.antlr.org/).
+This project is a simple interpreter and compiler implemented in Java using [ANTLR](https://www.antlr.org/).
+
+The implementation is described in three articles (in English and German):
+- [Developing your own programming language in Java+ANTLR: Interpreter](https://intechcore.com/en/development-of-an-own-programming-language-in-javaantlr-interpreter/)
+- [Developing your own programming language in Java+ANTLR: diagnostics of errors](https://intechcore.com/en/entwicklung-einer-eigenen-programmiersprache-in-javaantlr-fehlerdiagnose/)
+- [Developing your own programming language in Java+ANTLR: Compiler](https://intechcore.com/en/development-of-an-own-programming-language-in-javaantlr-compiler/)
+
 
 ## Prerequisites
 
