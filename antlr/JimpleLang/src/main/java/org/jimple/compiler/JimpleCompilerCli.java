@@ -32,7 +32,7 @@ public class JimpleCompilerCli {
         }
 
         try {
-            final Path filePath = Path.of(args[0]);
+            final Path filePath = Path.of(args[0]).toAbsolutePath();
             if (Files.notExists(filePath)) {
                 System.out.println("File not found: " + filePath);
                 System.exit(EXIT_FILE_NOT_FOUND);

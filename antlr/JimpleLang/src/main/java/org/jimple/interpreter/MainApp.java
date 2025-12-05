@@ -21,7 +21,7 @@ public final class MainApp {
             System.exit(1);
         }
 
-        final Path path = Paths.get(args[0]);
+        final Path path = Paths.get(args[0]).toAbsolutePath();
         if (!Files.exists(path)) {
             System.err.println("File not found: " + path);
             System.exit(1);
